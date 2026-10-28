@@ -1,0 +1,121 @@
+
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StudyCards</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #101827;
+      color: white;
+      padding: 24px;
+      max-width: 600px;
+      margin: auto;
+    }
+
+    input, textarea, button {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 10px;
+      border: none;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+
+    button {
+      background: #71e5bd;
+      color: #102a32;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .cartao {
+      background: #263b64;
+      padding: 18px;
+      margin-top: 16px;
+      border-radius: 14px;
+    }
+  </style>
+</head>
+<body>
+  <h1>📚 StudyCards</h1>
+  <p>Cria os teus próprios flashcards!</p>
+
+  <input id="pergunta" placeholder="Escreve a pergunta">
+  <textarea id="resposta" placeholder="Escreve a resposta"></textarea>
+  <button onclick="adicionar()">Adicionar cartão</button>
+
+  <h2>Os meus cartões</h2>
+  <div id="lista"></div>
+
+  <script>
+    let cartoes = JSON.parse(
+      localStorage.getItem("studycards") || "[]"
+    );
+
+    function guardar() {
+      localStorage.setItem(
+        "studycards", JSON.stringify(cartoes)
+      );
+    }
+
+    function mostrar() {
+      const lista = document.getElementById("lista");
+      lista.replaceChildren();
+
+      cartoes.forEach((c, i) => {
+        const div = document.createElement("div");
+        div.className = "cartao";
+
+        const p = document.createElement("p");
+        p.textContent = "Pergunta: " + c.p;
+
+        const r = document.createElement("p");
+        r.textContent = "Resposta: " + c.r;
+        r.hidden = true;
+
+        const ver = document.createElement("button");
+        ver.textContent = "Ver resposta";
+        ver.onclick = () => {
+          r.hidden = !r.hidden;
+          ver.textContent = r.hidden
+            ? "Ver resposta" : "Esconder resposta";
+        };
+
+        const apagar = document.createElement("button");
+        apagar.textContent = "Apagar cartão";
+        apagar.onclick = () => {
+          cartoes.splice(i, 1);
+          guardar();
+          mostrar();
+        };
+
+        div.append(p, r, ver, apagar);
+        lista.append(div);
+      });
+    }
+
+    function adicionar() {
+      const p = document.getElementById("pergunta");
+      const r = document.getElementById("resposta");
+
+      if (!p.value.trim() || !r.value.trim()) {
+        alert("Preenche a pergunta e a resposta!");
+        return;
+      }
+
+      cartoes.push({ p: p.value.trim(), r: r.value.trim() });
+      guardar();
+      p.value = "";
+      r.value = "";
+      mostrar();
+    }
+
+    mostrar();
+  </script>
+</body>
+</html>
